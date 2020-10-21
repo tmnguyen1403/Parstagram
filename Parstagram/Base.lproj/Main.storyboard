@@ -89,11 +89,65 @@
                         <viewLayoutGuide key="safeArea" id="NBb-is-Gm1"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <navigationItem key="navigationItem" id="FV8-Ru-iTR"/>
+                    <navigationItem key="navigationItem" id="FV8-Ru-iTR">
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="square.and.arrow.up.fill" catalog="system" id="F3m-AD-9VE">
+                            <connections>
+                                <segue destination="Il9-YW-ZIM" kind="presentation" id="QZ5-YL-AtZ"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LTk-8P-I5h" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1973.913043478261" y="132.58928571428572"/>
+        </scene>
+        <!--Camera View Controller-->
+        <scene sceneID="5hg-BP-LaE">
+            <objects>
+                <viewController id="Il9-YW-ZIM" customClass="CameraViewController" customModule="Parstagram" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="JK4-0q-w45">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="photo" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="4Xt-ED-mLU">
+                                <rect key="frame" x="20" y="35" width="374" height="348"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="Ce4-t9-4Rt" appends="YES" id="geh-8C-vP0"/>
+                                </connections>
+                            </imageView>
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OM8-zN-BWj">
+                                <rect key="frame" x="20" y="404" width="374" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rfE-Im-oP2">
+                                <rect key="frame" x="20" y="512" width="374" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="onSubmit:" destination="Il9-YW-ZIM" eventType="touchUpInside" id="AI2-p8-4hL"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="lHm-o0-Efb"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <connections>
+                        <outlet property="commentField" destination="OM8-zN-BWj" id="jfp-Gg-Hjg"/>
+                        <outlet property="imageView" destination="4Xt-ED-mLU" id="pkd-GZ-sR3"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zAM-Hl-6Yd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Ce4-t9-4Rt">
+                    <connections>
+                        <action selector="onCameraButton:" destination="Il9-YW-ZIM" id="EcA-sK-cNu"/>
+                    </connections>
+                </tapGestureRecognizer>
+            </objects>
+            <point key="canvasLocation" x="2808.6956521739135" y="138.61607142857142"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Wfv-dY-yTj">
@@ -116,6 +170,8 @@
         </scene>
     </scenes>
     <resources>
+        <image name="photo" catalog="system" width="128" height="93"/>
+        <image name="square.and.arrow.up.fill" catalog="system" width="115" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
