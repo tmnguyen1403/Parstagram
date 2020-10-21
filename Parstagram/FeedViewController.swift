@@ -9,7 +9,8 @@ import UIKit
 
 class FeedViewController: UIViewController {
 
-    override func viewDidLoad() {
+  @IBOutlet weak var tableView: UINavigationItem!
+  override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
