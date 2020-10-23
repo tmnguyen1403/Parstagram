@@ -15,7 +15,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   var refreshControl : UIRefreshControl!
   
   var posts = [PFObject]() //create an empty array of PFObject
-  let LIMIT_POST:Int = 10
+  let LIMIT_POST:Int = 20
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -39,20 +39,22 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   func getPosts() {
     let query = PFQuery(className: "Post")
     query.includeKey("author")
-    query.limit = LIMIT_POST + self.posts.count
+    query.limit = LIMIT_POST
     
     query.findObjectsInBackground { (posts, error) in
-      if posts != nil {
+      if let posts = posts{
         print("onRefresh get new posts");
-        self.posts = posts!
+        self.posts = posts
         self.tableView.reloadData()
         self.refreshControl.endRefreshing()
+        
       }
       else if let error = error {
         print("Error getPoss \(error.localizedDescription)")
         self.displayError(error: error, "getPosts")
       }
     }
+    self.tableView.reloadData()
   }
   
   @IBAction func onLogout(_ sender: Any) {
@@ -95,14 +97,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     cell.photoView.af.setImage(withURL: url)
     return cell
   }
-  
-  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    //load more posts when reaching the end of tableView
-//    if (indexPath.row + 1 == self.posts.count) {
-//      getPosts()
-//    }
-  }
-  
+
   func displayError(error: Error, _ performAction: String) {
     //prepare message
     let title = "Error \(performAction)"
