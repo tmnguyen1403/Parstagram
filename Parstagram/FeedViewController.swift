@@ -12,14 +12,21 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
  
 
   @IBOutlet weak var tableView: UITableView!
+  var refreshControl : UIRefreshControl!
   
   var posts = [PFObject]() //create an empty array of PFObject
+  
   override func viewDidLoad() {
-        super.viewDidLoad()
+    super.viewDidLoad()
 
     tableView.delegate = self
     tableView.dataSource = self
-    }
+    
+    //refresh
+    refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(onRefresh(_:)), for: .valueChanged)
+    tableView.insertSubview(refreshControl, at: 0)
+  }
     
   
   override func viewDidAppear(_ animated: Bool) {
@@ -35,7 +42,24 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         self.tableView.reloadData()
       }
     }
-    tableView.reloadData()
+  }
+  
+  @objc
+  func onRefresh(_ refreshControl: UIRefreshControl) {
+    print("onRefresh method");
+    let query = PFQuery(className: "Post")
+    query.includeKey("author")
+    query.limit = 20
+    
+    query.findObjectsInBackground { (posts, error) in
+      if posts != nil {
+        print("onRefresh get new posts");
+        self.posts = posts!
+        self.tableView.reloadData()
+        refreshControl.endRefreshing()
+      }
+    }
+    
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
