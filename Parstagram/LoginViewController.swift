@@ -44,18 +44,24 @@ class LoginViewController: UIViewController {
   }
   
   @IBAction func onSignUp(_ sender: Any) {
-    let user = PFUser()
-    
-  
-    user.username = usernameField.text
-    user.password = passwordField.text
-    print(user.username!)
-    user.signUpInBackground { (success, error) in
-      if let error = error{
-        print("Sign up Error: \(error.localizedDescription)")
-      } else {
-        print("Sign up successfully")
-        self.performSegue(withIdentifier: "loginSegue", sender: nil)
+    if let username = usernameField.text, let password = passwordField.text {
+      if isEmptyField(username) || isEmptyField(password) {
+        self.displayFieldEmptyError()
+      }
+      else {
+        let user = PFUser()
+        
+        user.username = username
+        user.password = password
+        
+        user.signUpInBackground { (success, error) in
+          if let error = error{
+            print("Sign up Error: \(error.localizedDescription)")
+          } else {
+            print("Sign up successfully")
+            self.performSegue(withIdentifier: "loginSegue", sender: nil)
+          }
+        }
       }
     }
   }
