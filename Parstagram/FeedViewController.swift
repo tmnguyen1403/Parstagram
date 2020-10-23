@@ -15,6 +15,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   var refreshControl : UIRefreshControl!
   
   var posts = [PFObject]() //create an empty array of PFObject
+  let LIMIT_POST:Int = 2
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -32,14 +33,20 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
+    getPosts()
+  }
+  
+  func getPosts() {
     let query = PFQuery(className: "Post")
     query.includeKey("author")
-    query.limit = 20
+    query.limit = LIMIT_POST + self.posts.count
     
     query.findObjectsInBackground { (posts, error) in
       if posts != nil {
+        print("onRefresh get new posts");
         self.posts = posts!
         self.tableView.reloadData()
+        self.refreshControl.endRefreshing()
       }
     }
   }
@@ -47,19 +54,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   @objc
   func onRefresh(_ refreshControl: UIRefreshControl) {
     print("onRefresh method");
-    let query = PFQuery(className: "Post")
-    query.includeKey("author")
-    query.limit = 20
-    
-    query.findObjectsInBackground { (posts, error) in
-      if posts != nil {
-        print("onRefresh get new posts");
-        self.posts = posts!
-        self.tableView.reloadData()
-        refreshControl.endRefreshing()
-      }
-    }
-    
+    getPosts()
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -82,6 +77,12 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     cell.photoView.af.setImage(withURL: url)
     return cell
   }
-   
+  
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    //load more posts when reaching the end of tableView
+    if (indexPath.row + 1 == self.posts.count) {
+      getPosts()
+    }
+  }
 
 }
