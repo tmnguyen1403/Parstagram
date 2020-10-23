@@ -21,21 +21,25 @@ class LoginViewController: UIViewController {
 
   @IBAction func onSignIn(_ sender: Any) {
     if let username = usernameField.text, let password = passwordField.text {
-      PFUser.logInWithUsername(inBackground: username, password: password) { (user, error) in
-        if let error = error {
-          print("Log in ERROR \(error.localizedDescription)")
-        }
-        else if let user = user {
-          print("Log in successfully")
-          self.performSegue(withIdentifier: "loginSegue", sender: nil)
-        }
-        else {
-          print("Log in ERROR UNKNOWN")
+      if isEmptyField(username) || isEmptyField(password) {
+        self.displayFieldEmptyError()
+      }
+      else {
+        PFUser.logInWithUsername(inBackground: username, password: password) { (user, error) in
+          if let error = error {
+            print("Log in ERROR \(error.localizedDescription)")
+            self.displayError(error: error, "login")
+          }
+          else if let user = user {
+            print("Log in successfully")
+            self.performSegue(withIdentifier: "loginSegue", sender: nil)
+          }
         }
       }
     }
     else {
       print("Log in ERROR username and password cannot be empty")
+      self.displayFieldEmptyError()
     }
   }
   
@@ -54,5 +58,30 @@ class LoginViewController: UIViewController {
         self.performSegue(withIdentifier: "loginSegue", sender: nil)
       }
     }
+  }
+  
+  func isEmptyField(_ field: String) -> Bool{
+    return field == ""
+  }
+  
+  func displayFieldEmptyError() {
+    let title = "Error login"
+    let message = "Username and password cannot be empty"
+    //render error
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let OKAction = UIAlertAction(title: "OK", style: .default)
+    alertController.addAction(OKAction)
+    present(alertController, animated: true, completion: nil)
+  }
+  
+  func displayError(error: Error, _ performAction: String) {
+    //prepare message
+    let title = "Error \(performAction)"
+    let message = "Something when wrong while \(performAction): \(error.localizedDescription)"
+    //render error
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let OKAction = UIAlertAction(title: "OK", style: .default)
+    alertController.addAction(OKAction)
+    present(alertController, animated: true, completion: nil)
   }
 }

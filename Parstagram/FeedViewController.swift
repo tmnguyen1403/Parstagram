@@ -48,6 +48,10 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         self.tableView.reloadData()
         self.refreshControl.endRefreshing()
       }
+      else if let error = error {
+        print("Error getPoss \(error.localizedDescription)")
+        self.displayError(error: error, "getPosts")
+      }
     }
   }
   
@@ -55,6 +59,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     PFUser.logOutInBackground { (error) in
       if let error = error {
         print("Error Logout \(error.localizedDescription)")
+        self.displayError(error: error, "logout")
       }
       else {
         print("logout successfully")
@@ -97,5 +102,15 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
 //      getPosts()
 //    }
   }
-
+  
+  func displayError(error: Error, _ performAction: String) {
+    //prepare message
+    let title = "Error \(performAction)"
+    let message = "Something when wrong while \(performAction): \(error.localizedDescription)"
+    //render error
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let OKAction = UIAlertAction(title: "OK", style: .default)
+    alertController.addAction(OKAction)
+    present(alertController, animated: true, completion: nil)
+  }
 }
