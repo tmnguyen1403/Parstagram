@@ -15,7 +15,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   var refreshControl : UIRefreshControl!
   
   var posts = [PFObject]() //create an empty array of PFObject
-  let LIMIT_POST:Int = 2
+  let LIMIT_POST:Int = 10
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -51,6 +51,19 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
   }
   
+  @IBAction func onLogout(_ sender: Any) {
+    PFUser.logOutInBackground { (error) in
+      if let error = error {
+        print("Error Logout \(error.localizedDescription)")
+      }
+      else {
+        print("logout successfully")
+        NotificationCenter.default.post(name: NSNotification.Name("logout"), object: nil)
+      }
+    }
+  }
+  
+  
   @objc
   func onRefresh(_ refreshControl: UIRefreshControl) {
     print("onRefresh method");
@@ -80,9 +93,9 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
   
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     //load more posts when reaching the end of tableView
-    if (indexPath.row + 1 == self.posts.count) {
-      getPosts()
-    }
+//    if (indexPath.row + 1 == self.posts.count) {
+//      getPosts()
+//    }
   }
 
 }

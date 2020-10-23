@@ -17,6 +17,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
     guard let _ = (scene as? UIWindowScene) else { return }
+    
+    //add event listener when user logout
+    NotificationCenter.default.addObserver(forName: Notification.Name("logout"), object: nil, queue: OperationQueue.main) { (Notification) in
+      print("Logout Notificaiton Received")
+      self.logout()
+    }
+  }
+  
+  func logout() {
+    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+    
+    window?.rootViewController = storyboard.instantiateViewController(withIdentifier: "LoginScreen")
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
