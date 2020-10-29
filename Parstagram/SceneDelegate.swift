@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Parse
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -23,9 +24,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       print("Logout Notificaiton Received")
       self.logout()
     }
+    
+    //keep user stay logged in
+    print("will connect to")
+    if PFUser.current() != nil {
+      print("found user")
+      let main = UIStoryboard(name: "Main", bundle: nil)
+      let feedNavigationController = main.instantiateViewController(withIdentifier: "FeedNavigationController")
+      
+      window?.rootViewController = feedNavigationController
+    } else {
+      print("need to login")
+    }
   }
   
   func logout() {
+    print("called Logout in SceneDelegate")
     let storyboard = UIStoryboard(name: "Main", bundle: nil)
     
     window?.rootViewController = storyboard.instantiateViewController(withIdentifier: "LoginScreen")
