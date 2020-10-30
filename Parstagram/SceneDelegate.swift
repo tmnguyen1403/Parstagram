@@ -43,6 +43,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let storyboard = UIStoryboard(name: "Main", bundle: nil)
     
     window?.rootViewController = storyboard.instantiateViewController(withIdentifier: "LoginScreen")
+    
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
