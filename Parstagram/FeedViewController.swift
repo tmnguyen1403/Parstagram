@@ -7,28 +7,54 @@
 
 import UIKit
 import Parse
+import AlamofireImage
+import MessageInputBar
 
-class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, MessageInputBarDelegate {
  
 
   @IBOutlet weak var tableView: UITableView!
+  let commentBar = MessageInputBar()
+  var showCommentBar = false
   var refreshControl : UIRefreshControl!
-  
   var posts = [PFObject]() //create an empty array of PFObject
+  var selectedPost: PFObject!
   let LIMIT_POST:Int = 20
   
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    
+    commentBar.inputTextView.placeholder = "Add a comment..."
+    commentBar.sendButton.title = "Post"
+    commentBar.delegate = self
+    
     tableView.delegate = self
     tableView.dataSource = self
     
+    tableView.keyboardDismissMode = .interactive
     //refresh
     refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(onRefresh(_:)), for: .valueChanged)
     tableView.insertSubview(refreshControl, at: 0)
+  
+    let center = NotificationCenter.default
+    center.addObserver(self, selector: #selector(keyboardWillBeHidden(note:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+  }
+  
+  @objc
+  func keyboardWillBeHidden(note: Notification) {
+    commentBar.inputTextView.text = nil
+    showCommentBar = false
+    becomeFirstResponder()
   }
     
+  override var inputAccessoryView: UIView? {
+      return commentBar
+  }
+  
+  override var canBecomeFirstResponder: Bool {
+    return showCommentBar
+  }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
@@ -85,13 +111,40 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     let post = posts[section]
     let comments = (post["comments"] as? [PFObject]) ?? []
     
-    return comments.count + 1
+    //+1 for post
+    //+1 for add comment
+    
+    return comments.count + 2
+  }
+  
+  func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
+    //create the comment
+    let comment = PFObject(className: "Comments")
+    
+    comment["text"] = inputBar.inputTextView.text
+    comment["post"] = selectedPost
+    comment["author"] = PFUser.current()!
+
+    selectedPost.add(comment, forKey: "comments")
+
+    selectedPost.saveInBackground { (success, error) in
+      if success {
+        print("Comment saved")
+        self.tableView.reloadData()
+      } else {
+        print("Error saving comment")
+      }
+    }
+    //clear and dismiss the inputBar
+    commentBar.inputTextView.text = nil
+    showCommentBar = false
+    becomeFirstResponder()
+    commentBar.inputTextView.resignFirstResponder()
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let post = posts[indexPath.row]
+    let post = posts[indexPath.section]
     let comments = (post["comments"] as? [PFObject]) ?? []
-    
     //return a post cell
     if indexPath.row == 0 {
       let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell") as! PostCell
@@ -105,39 +158,40 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
       
       cell.photoView.af.setImage(withURL: url)
       return cell
-    } else {
+
+    } else if indexPath.row <= comments.count {
       //return a comment cell
       let cell = tableView.dequeueReusableCell(withIdentifier: "CommentCell") as! CommentCell
-      
+
       let comment = comments[indexPath.row - 1]
-      
+
       cell.commentLabel.text = (comment["text"] as? String) ?? "No comment"
-      
+
       let user = comment["author"] as! PFUser
       cell.nameLabel.text = user.username
-      
+
+      return cell
+    } else {
+      //return an "add comment cell"
+      let cell = tableView.dequeueReusableCell(withIdentifier: "AddCommentCell")!
+
       return cell
     }
   }
   
   //add comment when select post
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let post = posts[indexPath.row]
+    let post = posts[indexPath.section]
     
-    let comment = PFObject(className: "Comments")
-    comment["text"] = "This is a random comment"
-    comment["post"] = post
-    comment["author"] = PFUser.current()!
+    let comments = (post["comments"] as? [PFObject]) ?? []
     
-    post.add(comment, forKey: "comments")
-    
-    post.saveInBackground { (success, error) in
-      if success {
-        print("Comment saved")
-      } else {
-        print("Error saving comment")
-      }
+    if indexPath.row == comments.count + 1 {
+      selectedPost = post
+      showCommentBar = true
+      becomeFirstResponder()
+      commentBar.inputTextView.becomeFirstResponder()
     }
+
   }
 
   func displayError(error: Error, _ performAction: String) {
